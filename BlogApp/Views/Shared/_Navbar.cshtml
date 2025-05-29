@@ -1,0 +1,56 @@
+﻿<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">MyBlog</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+                       asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Posts" ? "active" : "")"
+                       asp-controller="Posts" asp-action="Index">Tüm Yazılar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Posts" asp-action="Create">Yeni Yazı</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Posts" asp-action="MyPosts">Yazılarım</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
+                @if (User.Identity!.IsAuthenticated)
+                {
+                    <li class="nav-item d-flex align-items-center">
+                        <span class="navbar-text text-white me-2">@User.Identity.Name</span>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link p-0" asp-controller="Users" asp-action="Profile">Profilim</a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <form asp-controller="Users" asp-action="Logout" method="post" class="d-inline m-0 p-0">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-link nav-link p-0 m-2">Çıkış Yap</button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Users" asp-action="Login">Giriş Yap</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Users" asp-action="Register">Kayıt Ol</a>
+                    </li>
+                }
+            </ul>
+
+
+        </div>
+    </div>
+</nav>

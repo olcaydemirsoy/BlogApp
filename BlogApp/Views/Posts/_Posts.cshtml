@@ -1,0 +1,52 @@
+﻿@model PostViewModel
+
+@foreach (var post in Model.Posts)
+{
+    <div class="card mb-4">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="~/img/@post.ImageUrl" class="img-fluid rounded-start h-100 object-fit-cover" />
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">@post.Title</h5>
+                    <p class="card-text">
+                        @((post.Content?.Length > 200) ? post.Content.Substring(0, 200) + "..." : post.Content)
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">@post.CreatedAt.ToString("dd MMM yyyy") — @post.User.UserName</small>
+                    </p>
+                    <a href="@Url.Action("Detail", "Posts", new { title = post.Title })" class="btn btn-sm btn-primary">Devamını Oku</a>
+                    <span class="ms-3 text-muted"><i class="bi bi-chat-left-text"></i> @post.Comments.Count yorum</span>
+                    <div class="mt-2">
+                        <i class="bi bi-tags me-1 text-muted"></i>
+                        @foreach (var tag in post.Tags)
+                        {
+                            <span class="badge bg-light text-dark border me-1">@tag.Text</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Pagination -->
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link" href="@Url.Action("Index", new { tagText = Model.SelectedTagText, page = Model.CurrentPage - 1 })">Önceki</a>
+        </li>
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { tagText = Model.SelectedTagText, page = i })">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" href="@Url.Action("Index", new { tagText = Model.SelectedTagText, page = Model.CurrentPage + 1 })">Sonraki</a>
+        </li>
+    </ul>
+</nav>

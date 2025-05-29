@@ -1,0 +1,20 @@
+﻿@model TagViewModel
+
+
+<div class="card mb-4">
+    <div class="card-header fw-bold bg-light">
+        Etiketler
+    </div>
+    <div class="card-body">
+        @foreach (var tag in Model.Tags)
+        {
+            var isSelected = (Model.SelectedTagId == tag.TagId);
+            var badgeClass = isSelected ? "bg-primary text-white" : "bg-secondary";
+
+            <a href="@Url.Action("Index", "Posts", new { tagText = tag.Text })"
+               class="badge @badgeClass me-1 mb-1 text-decoration-none">
+                @tag.Text
+            </a>
+        }
+    </div>
+</div>

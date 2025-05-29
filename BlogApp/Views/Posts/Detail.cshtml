@@ -1,0 +1,109 @@
+﻿@model Post
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card border-0 shadow-sm p-4">
+                <h2 class="fw-bold mb-2">@Model.Title</h2>
+
+                <p class="text-muted mb-3">
+                    <i class="bi bi-calendar3"></i> @Model.CreatedAt.ToString("dd MMMM yyyy")
+                    |
+                    <i class="bi bi-person-circle"></i> @Model.User?.UserName
+                </p>
+
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="~/img/@Model.ImageUrl" class="img-fluid rounded mb-4 border" alt="Post Görseli" />
+                }
+
+                <div class="fs-5 mb-4">
+                    @Html.Raw(Model.Content)
+                </div>
+
+                <div class="mb-4">
+                    <strong class="d-block mb-2">Etiketler:</strong>
+                    @if (Model.Tags != null && Model.Tags.Any())
+                    {
+                        foreach (var tag in Model.Tags)
+                        {
+                            <a class="btn btn-sm btn-outline-primary rounded-pill me-2 mb-2"
+                               href="@Url.Action("Index", "Posts", new { tagText = tag.Text })">
+                                <i class="bi bi-tag"></i> @tag.Text
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">Etiket bulunamadı.</span>
+                    }
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <h4 class="mb-3">💬 Yorumlar</h4>
+                <hr />
+
+                @if (Model.Comments != null && Model.Comments.Any())
+                {
+                    foreach (var comment in Model.Comments)
+                    {
+                        
+                        <div class="border rounded p-3 mb-3 bg-light d-flex">
+                            @{
+                                var url = comment.User?.ImageUrl ?? "default-profile.png";
+                            }
+                            <img src="~/img/profile/@url"
+                                 alt="Profil Resmi"
+                                 class="rounded-circle me-3"
+                                 style="width: 48px; height: 48px; object-fit: cover;">
+                            <div>
+                                <div class="fw-bold mb-1">@comment.User.UserName</div>
+                                <div>@comment.CommentText</div>
+                                <div class="text-muted small mt-1">@comment.CreatedAt.ToString("dd.MM.yyyy HH:mm")</div>
+                            </div>
+                        </div>
+
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">Henüz yorum yok.</p>
+                }
+            </div>
+            @if (User.Identity!.IsAuthenticated)
+            {
+                <div class="mt-4">
+                    <h5>Yorum Yaz</h5>
+
+                    @using (Html.BeginForm("AddComment", "Posts", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="postId" value="@Model.PostId" />
+
+                        <div class="mb-3">
+                            <label class="form-label">@User.Identity.Name</label>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Yorumunuz</label>
+                            <textarea name="commentText" class="form-control" placeholder="Yorumunuzu yazınız" rows="4"></textarea>
+                            @if (TempData["CommentError"] != null)
+                            {
+                                <div class="text-danger">@TempData["CommentError"]</div>
+                            }
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Gönder</button>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">Yorum yapmak için giriş yapmalısınız.</div>
+            }
+
+        </div>
+    </div>
+</div>
