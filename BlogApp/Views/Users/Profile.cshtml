@@ -1,0 +1,110 @@
+﻿@model UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Profilim";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+
+            <!-- Kullanıcı Bilgileri Card (Açılır Kapanır Değil Sabit Kalsın) -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Url.Content($"~/img/profiles/{Model.ImageUrl}")" alt="Profil Resmi" class="rounded-circle me-3" style="width:60px; height:60px; object-fit:cover;" />
+                    }
+                    <h4 class="mb-0">@(!string.IsNullOrEmpty(Model.Name) ? Model.Name : Model.UserName)</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Kullanıcı Adı:</strong> @Model.UserName</p>
+                    <p><strong>Kayıt Tarihi:</strong> @Model.CreatedAt.ToString("dd MMMM yyyy")</p>
+                </div>
+            </div>
+
+            <!-- Accordion Başlangıcı -->
+            <div class="accordion" id="profileAccordion">
+
+                <!-- Yazılar Accordion Item -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingPosts">
+                        <button class="accordion-button collapsed custom-accordion-header" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#collapsePosts" 
+                                aria-expanded="false" aria-controls="collapsePosts">
+                            <i class="bi bi-journal-text me-2"></i> Yazdığım Yazılar (@Model.Posts.Count)
+                        </button>
+                    </h2>
+                    <div id="collapsePosts" class="accordion-collapse collapse" aria-labelledby="headingPosts" data-bs-parent="#profileAccordion">
+                        <div class="accordion-body">
+                            @if (Model.Posts.Any())
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var post in Model.Posts)
+                                    {
+                                        <li class="list-group-item">
+                                            <a asp-controller="Posts" asp-action="Detail" asp-route-title="@post.Title">
+                                                <strong>@post.Title</strong>
+                                            </a>
+                                            <br />
+                                            <small class="text-muted">@post.CreatedAt.ToString("dd MMM yyyy")</small>
+                                            <p class="mt-1">@post.ContentSnippet</p>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p>Henüz yazı yazmadınız.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yorumlar Accordion Item -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingComments">
+                        <button class="accordion-button collapsed custom-accordion-header" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#collapseComments"
+                                aria-expanded="false" aria-controls="collapseComments">
+                            <i class="bi bi-journal-text me-2"></i> Yaptığım Yorumlar (@Model.Comments.Count)
+                        </button>
+                    </h2>
+                    <div id="collapseComments" class="accordion-collapse collapse" aria-labelledby="headingComments" data-bs-parent="#profileAccordion">
+                        <div class="accordion-body">
+                            @if (Model.Comments.Any())
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var comment in Model.Comments)
+                                    {
+                                        <li class="list-group-item">
+                                            <small class="text-muted">@comment.CreatedAt.ToString("dd MMM yyyy HH:mm")</small><br />
+                                            <p>@comment.CommentText</p>
+                                            <small>
+                                                Yorum yapılan yazı:
+                                                <a asp-controller="Posts" asp-action="Detail" asp-route-title="@comment.PostTitle">
+                                                    @comment.PostTitle
+                                                </a>
+                                            </small>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p>Henüz yorum yapmadınız.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- Accordion Bitişi -->
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

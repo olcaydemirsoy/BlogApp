@@ -6,15 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Users/Login"; // Giriþ sayfasý
-        options.LogoutPath = "/Users/Logout"; // Çýkýþ
-        options.AccessDeniedPath = "/Users/AccessDenied"; // Yetkisiz eriþim
-    });
-
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
     {
         options.Password.RequiredLength = 6;
@@ -25,6 +16,15 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
     .AddEntityFrameworkStores<BlogContext>()
     .AddDefaultTokenProviders();
 // Add services to the container.
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Users/Login";
+    options.LogoutPath = "/Users/Logout";
+    options.AccessDeniedPath = "/Users/AccessDenied";
+});
+
+
 builder.Services.AddControllersWithViews();
 
 
@@ -69,6 +69,12 @@ app.UseAuthorization();
 app.UseSession();
 
 app.MapControllerRoute(
+    name: "myPosts",
+    pattern: "Posts/Mine",
+    defaults: new { controller = "Posts", action = "MyPosts" }
+);
+
+app.MapControllerRoute(
     name: "postDetail",
     pattern: "posts/detail/{title}",
     defaults: new { controller = "Posts", action = "Detail" }
@@ -77,8 +83,7 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "tagPosts",
     pattern: "posts/tag/{tagText}",
-    defaults: new { controller = "Posts", action = "Index" }
-);
+    defaults: new { controller = "Posts", action = "Index" });
 
 app.MapControllerRoute(
     name: "allPosts",

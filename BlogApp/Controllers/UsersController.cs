@@ -1,8 +1,11 @@
-﻿using BlogApp.Models;
+﻿using System.Security.Claims;
+using BlogApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using BlogApp.Entity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.Controllers
 {
@@ -23,6 +26,7 @@ namespace BlogApp.Controllers
         {
             if(User.Identity.IsAuthenticated)
                 return RedirectToAction("Index", "Home");
+
             return View();
         }
 
@@ -117,5 +121,48 @@ namespace BlogApp.Controllers
 
             return View(model);
         }
+
+        [Authorize]
+        public IActionResult Profile()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int userId))
+                return RedirectToAction("Index", "Home");
+
+            var user = _userManager.Users
+                .Include(u => u.Posts)
+                .Include(u => u.Comments)
+                .ThenInclude(c => c.Post)
+                .FirstOrDefault(u => u.Id == userId);
+
+            if (user == null)
+                return NotFound();
+
+            var model = new UserProfileViewModel
+            {
+                Name = user.Name,
+                UserName = user.UserName,
+                ImageUrl = user.ImageUrl,
+                CreatedAt = user.CreatedAt, // User modeline eklediysen
+                Posts = user.Posts.Select(p => new UserPostSummary
+                {
+                    PostId = p.PostId,
+                    Title = p.Title,
+                    CreatedAt = p.CreatedAt,
+                    ContentSnippet = p.Content.Length > 100 ? p.Content.Substring(0, 100) + "..." : p.Content
+                }).OrderByDescending(p => p.CreatedAt).ToList(),
+
+                Comments = user.Comments.Select(c => new UserCommentSummary
+                {
+                    CommentId = c.CommentId,
+                    CommentText = c.CommentText,
+                    CreatedAt = c.CreatedAt,
+                    PostTitle = c.Post.Title
+                }).OrderByDescending(c => c.CreatedAt).ToList()
+            };
+
+            return View(model);
+        }
+
     }
 }

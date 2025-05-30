@@ -1,0 +1,97 @@
+﻿@model CreatePostViewModel
+
+@{
+    var formTitle = ViewBag.FormTitle as string ?? "Yeni Yazı Ekle";
+    ViewData["Title"] = formTitle;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>@formTitle</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreatePost" method="post" enctype="multipart/form-data"
+                          @* Düzenleme için id gönderiyoruz *@
+                          asp-route-id="@(ViewBag.PostId ?? "")"
+                    >
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Başlık</label>
+                            <input asp-for="Title" class="form-control" placeholder="Yazının başlığı" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Content" class="form-label">İçerik</label>
+                            <textarea asp-for="Content" class="form-control" rows="6" placeholder="Yazınızın içeriğini buraya girin..."></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ImageFile" class="form-label">Kapak Görseli</label>
+                            <input asp-for="ImageFile" type="file" class="form-control" />
+                            <span asp-validation-for="ImageFile" class="text-danger"></span>
+
+                            @* Düzenleme sırasında mevcut görsel varsa göster *@
+                            @if (ViewBag.ExistingImageUrl != null)
+                            {
+                                <div class="mt-2">
+                                    <p>Mevcut Görsel:</p>
+                                    <img src="~/img/@ViewBag.ExistingImageUrl" alt="Kapak Görseli" class="img-thumbnail" style="max-height: 200px;" />
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Etiketler</label>
+                            <div class="row row-cols-2 row-cols-md-3 g-2">
+                                @foreach (var tag in Model.AvailableTags!)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               value="@tag.TagId"
+                                               name="SelectedTagIds"
+                                               id="tag_@tag.TagId"
+                                               @(Model.SelectedTagIds.Contains(tag.TagId) ? "checked" : "") />
+                                        <label class="form-check-label" for="tag_@tag.TagId">
+                                            <i class="bi bi-tag-fill text-muted me-1"></i>@tag.Text
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Aktif/Pasif Durumu -->
+                        <div class="mb-3">
+                            <label class="form-label">Durum</label>
+                            <select asp-for="IsActive" class="form-select">
+                                <option value="true">Aktif</option>
+                                <option value="false">Taslak (Pasif)</option>
+                            </select>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle me-1"></i>
+                                @(formTitle.Contains("Düzenle") ? "Yazıyı Güncelle" : "Yazıyı Yayınla")
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a asp-controller="Posts" asp-action="Index" class="text-decoration-none">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Tüm Yazılara Dön
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

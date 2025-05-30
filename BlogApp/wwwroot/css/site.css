@@ -33,3 +33,14 @@ body {
 main {
     flex: 1;
 }
+
+.custom-accordion-header {
+    font-size: 1.25rem; /* Baþlýðý biraz büyütür */
+    font-weight: 700; /* Kalýn yapar */
+    color: #0d6efd; /* Bootstrap primary rengi */
+    text-shadow: 0 0 2px rgba(13, 110, 253, 0.6); /* Hafif gölge */
+}
+
+    .custom-accordion-header i {
+        color: #0d6efd; /* Ýkon rengi baþlýkla uyumlu */
+    }
